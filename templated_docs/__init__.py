@@ -123,7 +123,7 @@ def fill_template(template_name, context, output_format='odt'):
         if name.endswith('.xml'):
             data = smart_str(data)
 
-        if any(name.endswith(file) for file in ('content.xml', 'styles.xml')):
+        if any(name.endswith(fn) for fn in ('content.xml', 'styles.xml')):
             template = Template(fix_inline_tags(data))
             data = template.render(context)
         elif name == 'META-INF/manifest.xml':
@@ -134,10 +134,10 @@ def fill_template(template_name, context, output_format='odt'):
     for _, image in context.dicts[0].get(IMAGES_CONTEXT_KEY, {}).items():
         filename = os.path.basename(image.name)
         ext = os.path.splitext(filename)[1][1:]
-        manifest_data += ('<manifest:file-entry '
-                          'manifest:media-type="image/%(ext)s" '
-                          'manifest:full-path="Pictures/%(filename)s"/>\n'
-                          ) % locals()
+        manifest_data += (
+            '<manifest:file-entry manifest:media-type="image/%(ext)s" '
+            'manifest:full-path="Pictures/%(filename)s"/>\n'
+        ) % {'ext': ext, 'filename': filename}
         image.open()
         dest.writestr('Pictures/%s' % filename, image.read())
         image.close()
